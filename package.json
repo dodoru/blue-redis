@@ -1,6 +1,35 @@
 {
+  "name": "blue-redis",
+  "version": "0.0.1",
+  "description": "wrap redis models with bluebird , promisify by Async-Await. ",
+  "author": "dodoru <dodoru@foxmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dodoru/blue-redis.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "nodejs",
+    "blue-redis",
+    "redis",
+    "bluebird",
+    "promise",
+    "redis model"
+  ],
+  "engines": {
+    "node": ">= 8.0"
+  },
   "dependencies": {
     "bluebird": "^3.5.1",
     "redis": "^2.8.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/dodoru/blue-redis/issues"
+  },
+  "homepage": "https://github.com/dodoru/blue-redis#readme",
+  "devDependencies": {}
 }
