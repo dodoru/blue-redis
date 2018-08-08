@@ -57,6 +57,10 @@ class redisSets extends redisDB {
         super(key, client);
     }
 
+    async allSync() {
+        return await this.client.smembersAsync(this.db_key);
+    }
+
     async hasSync(name) {
         return await this.client.sismemberAsync(this.db_key, name)
     }
@@ -66,7 +70,7 @@ class redisSets extends redisDB {
     }
 
     async delSync(name) {
-        await this.client.sremAsync(this.db_key, name);
+        return await this.client.sremAsync(this.db_key, name);
     }
 }
 
