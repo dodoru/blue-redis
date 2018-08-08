@@ -5,7 +5,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 
-const redisClient = function (config={}) {
+const redisClient = function (config = {}) {
     const cfg = {
         host: config.host || '127.0.0.1',
         port: config.port || 6379,
@@ -19,6 +19,13 @@ const redisClient = function (config={}) {
 
 class redisDB {
     constructor(key, client) {
+        const name = this.constructor.name;
+        if (!key) {
+            throw new Error(`[${name}] init failed, invalid key <str:index>`)
+        }
+        if (!client) {
+            throw new Error(`[${name}] init failed, invalid client <object:result of redisClient()>`)
+        }
         this.db_key = key;
         this.client = client;
     }
@@ -258,6 +265,7 @@ module.exports = {
         bluebird,
     },
     redisClient: redisClient,
+    redisDB: redisDB,
     redisSets: redisSets,
     redisHash: redisHash,
     redisZset: redisZset,
