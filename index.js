@@ -30,15 +30,15 @@ class redisDB {
         this.client = client;
     }
 
-    async freeSync() {
+    async freeAsync() {
         return await this.client.delAsync(this.db_key);
     }
 
-    async expireSync(seconds) {
+    async expireAsync(seconds) {
         return await this.client.expireAsync(this.db_key, seconds);
     }
 
-    async expireAtSync(ts) {
+    async expireAtAsync(ts) {
         ts = parseInt(ts);
         if (String(ts).length === 13) {
             ts = parseInt(ts / 1000);
@@ -46,7 +46,7 @@ class redisDB {
         return await this.client.expireatAsync(this.db_key, ts);
     }
 
-    async existsSync() {
+    async existsAsync() {
         return await this.client.existsAsync(this.db_key);
     }
 }
@@ -57,19 +57,19 @@ class redisSets extends redisDB {
         super(key, client);
     }
 
-    async allSync() {
+    async allAsync() {
         return await this.client.smembersAsync(this.db_key);
     }
 
-    async hasSync(name) {
+    async hasAsync(name) {
         return await this.client.sismemberAsync(this.db_key, name)
     }
 
-    async addSync(name) {
+    async addAsync(name) {
         return await this.client.saddAsync(this.db_key, name);
     }
 
-    async delSync(name) {
+    async delAsync(name) {
         return await this.client.sremAsync(this.db_key, name);
     }
 }
@@ -81,17 +81,17 @@ class redisList extends redisDB {
         super(key, client);
     }
 
-    async lpushSync(...datas) {
+    async lpushAsync(...datas) {
         const items = datas.map(m => JSON.stringify(m));
         return await this.client.lpushAsync(this.db_key, items);
     }
 
-    async rpopSync() {
+    async rpopAsync() {
         const value = await this.client.rpopAsync(this.db_key);
         return JSON.parse(value);
     }
 
-    async blpopSync(timeout = 30) {
+    async blpopAsync(timeout = 30) {
         // null or ["${db_key}", "${value}"]
         const item = await this.client.blpopAsync(this.db_key, timeout);
         if (item !== null) {
@@ -100,7 +100,7 @@ class redisList extends redisDB {
         return item;
     }
 
-    async brpopSync(timeout = 30) {
+    async brpopAsync(timeout = 30) {
         // null or ["${db_key}", "${value}"]
         const item = await this.client.brpopAsync(this.db_key, timeout);
         if (item !== null) {
@@ -109,7 +109,7 @@ class redisList extends redisDB {
         return item;
     }
 
-    async rangeSync(start = 0, end = -1) {
+    async rangeAsync(start = 0, end = -1) {
         const items = await this.client.lrangeAsync(this.db_key, start, end);
         return items.map(m => JSON.parse(m));
     }
@@ -122,7 +122,7 @@ class redisHash extends redisDB {
         super(key, client);
     }
 
-    async hallSync() {
+    async hallAsync() {
         const ds = await this.client.hgetallAsync(this.db_key);
         const result = {};
         for (let index in ds) {
@@ -132,7 +132,7 @@ class redisHash extends redisDB {
         return result;
     }
 
-    async hgetSync(index) {
+    async hgetAsync(index) {
         let data = await this.client.hgetAsync(this.db_key, index);
         if (data !== null) {
             data = JSON.parse(data);
@@ -140,13 +140,13 @@ class redisHash extends redisDB {
         return data;
     }
 
-    async hsetSync(index, data) {
+    async hsetAsync(index, data) {
         if (data) {
             return await this.client.hsetAsync(this.db_key, index, JSON.stringify(data))
         }
     }
 
-    async hdelSync(index) {
+    async hdelAsync(index) {
         return await this.client.hdelAsync(this.db_key, index);
     }
 }
@@ -157,27 +157,27 @@ class redisZset extends redisDB {
         super(key, client);
     }
 
-    async sizeSync() {
+    async sizeAsync() {
         return await this.client.zcardAsync(this.db_key);
     }
 
-    async countSync(min_score, max_score) {
+    async countAsync(min_score, max_score) {
         return await this.client.zcountAsync(this.db_key, min_score, max_score);
     }
 
-    async zaddSync(...score_and_indexes) {
+    async zaddAsync(...score_and_indexes) {
         return await this.client.zaddAsync(this.db_key, ...score_and_indexes);
     }
 
-    async zscoreSync(index) {
+    async zscoreAsync(index) {
         return await this.client.zscoreAsync(this.db_key, index);
     }
 
-    async zrankSync(index) {
+    async zrankAsync(index) {
         return await this.client.zrankAsync(this.db_key, index);
     }
 
-    async zrangeSync(from_rnk = 0, end_rnk = -1, with_scores = true) {
+    async zrangeAsync(from_rnk = 0, end_rnk = -1, with_scores = true) {
         let ds;
         if (with_scores) {
             ds = await this.client.zrangeAsync(this.db_key, from_rnk, end_rnk, 'withscores');
@@ -187,8 +187,8 @@ class redisZset extends redisDB {
         return ds;
     }
 
-    async rangeSync(from_rnk = 0, end_rnk = -1) {
-        const ds = await this.zrangeSync.bind(this)(from_rnk, end_rnk, true);
+    async rangeAsync(from_rnk = 0, end_rnk = -1) {
+        const ds = await this.zrangeAsync.bind(this)(from_rnk, end_rnk, true);
         const data = [];
         let c_rank = 0;
         let c_score = 0;
@@ -205,10 +205,10 @@ class redisZset extends redisDB {
         return data;
     }
 
-    async rankSync(index) {
-        const rnk = await this.zrankSync.bind(this)(index);
+    async rankAsync(index) {
+        const rnk = await this.zrankAsync.bind(this)(index);
         if (rnk !== null) {
-            const ds = await this.rangeSync.bind(this)(0, rnk);
+            const ds = await this.rangeAsync.bind(this)(0, rnk);
             const item = ds[rnk];
             return item.rank
         }
@@ -220,11 +220,11 @@ class redisZset extends redisDB {
     *  rev 递减排列
     */
 
-    async zrevrankSync(index) {
+    async zrevrankAsync(index) {
         return await this.client.zrevrankAsync(this.db_key, index);
     }
 
-    async zrevrangeSync(from_rnk = 0, end_rnk = -1, with_scores = true) {
+    async zrevrangeAsync(from_rnk = 0, end_rnk = -1, with_scores = true) {
         let ds;
         if (with_scores) {
             ds = await this.client.zrevrangeAsync(this.db_key, from_rnk, end_rnk, 'withscores');
@@ -234,8 +234,8 @@ class redisZset extends redisDB {
         return ds;
     }
 
-    async revrangeSync(from_rnk = 0, end_rnk = -1) {
-        const ds = await this.zrevrangeSync.bind(this)(from_rnk, end_rnk, true);
+    async revrangeAsync(from_rnk = 0, end_rnk = -1) {
+        const ds = await this.zrevrangeAsync.bind(this)(from_rnk, end_rnk, true);
         const data = [];
         let c_rank = 0;
         let c_score = 0;
@@ -252,10 +252,10 @@ class redisZset extends redisDB {
         return data;
     }
 
-    async revrankSync(index) {
-        const rnk = await this.zrevrankSync.bind(this)(index);
+    async revrankAsync(index) {
+        const rnk = await this.zrevrankAsync.bind(this)(index);
         if (rnk !== null) {
-            const ds = await this.revrangeSync.bind(this)(0, rnk);
+            const ds = await this.revrangeAsync.bind(this)(0, rnk);
             const item = ds[rnk];
             return item.rank
         }

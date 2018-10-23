@@ -1,6 +1,6 @@
 {
   "name": "blue-redis",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "wrap redis models with bluebird , promisify by Async-Await. ",
   "author": "dodoru <dodoru@foxmail.com>",
   "license": "MIT",
